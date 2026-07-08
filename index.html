@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SEMI · The Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#0E1116;
+    --surface:#161A21;
+    --surface-2:#1B212B;
+    --border:#283040;
+    --border-soft:#1F2632;
+    --text:#E8EAED;
+    --muted:#98A1AF;
+    --faint:#6A7383;
+    --brass:#CDA349;
+    --brass-bright:#E6C476;
+    --ship:#57B98A;
+    --progress:#E08A52;
+    --road:#7C92B4;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(205,163,73,.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(124,146,180,.06), transparent 55%),
+      var(--ground);
+    color:var(--text);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+  a{color:inherit}
+
+  /* ---------- top bar ---------- */
+  header.bar{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(10px);
+    background:rgba(14,17,22,.82);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .bar-inner{
+    max-width:var(--maxw);margin:0 auto;padding:13px 28px;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .mark{
+    font-family:"IBM Plex Mono",monospace;font-weight:500;
+    letter-spacing:.32em;font-size:13px;color:var(--brass);
+    text-transform:uppercase;white-space:nowrap;
+  }
+  .mark span{color:var(--faint)}
+  .bar-spacer{flex:1}
+  .legend{display:flex;gap:16px;align-items:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+  .legend .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .d-ship{background:var(--ship)} .d-prog{background:var(--progress)} .d-road{background:var(--road)}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap}
+  .filters button{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;
+    background:transparent;color:var(--muted);
+    border:1px solid var(--border);border-radius:999px;
+    padding:5px 14px;cursor:pointer;transition:all .15s ease;
+  }
+  .filters button:hover{border-color:var(--brass);color:var(--text)}
+  .filters button[aria-pressed="true"]{background:var(--brass);border-color:var(--brass);color:#1A1407;font-weight:500}
+  .filters button:focus-visible{outline:2px solid var(--brass-bright);outline-offset:2px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:74px 0 30px}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.26em;
+    text-transform:uppercase;color:var(--brass);margin:0 0 22px;
+  }
+  .hero h1{
+    font-family:"Fraunces",serif;font-weight:500;
+    font-size:clamp(2.5rem,6.2vw,4.6rem);line-height:1.02;
+    letter-spacing:-.015em;margin:0;text-wrap:balance;max-width:16ch;
+  }
+  .hero h1 em{font-style:italic;color:var(--brass-bright)}
+  .lede{
+    margin:26px 0 0;max-width:62ch;font-size:1.16rem;color:var(--muted);line-height:1.6;
+  }
+  .lede strong{color:var(--text);font-weight:500}
+
+  /* ---------- stat strip ---------- */
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+    background:var(--border-soft);border:1px solid var(--border-soft);
+    border-radius:14px;overflow:hidden;margin:46px 0 6px;
+  }
+  .stat{background:var(--surface);padding:24px 22px}
+  .stat .n{font-family:"Fraunces",serif;font-weight:500;font-size:2.5rem;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat .n.brass{color:var(--brass-bright)}
+  .stat .k{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);margin-top:10px}
+
+  /* ---------- velocity timeline ---------- */
+  .velocity{margin:56px 0 14px;border:1px solid var(--border-soft);border-radius:14px;background:linear-gradient(180deg,var(--surface),rgba(22,26,33,.4));padding:26px 26px 18px}
+  .velocity .head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .velocity h3{font-family:"Fraunces",serif;font-weight:500;font-size:1.35rem;margin:0;letter-spacing:-.01em}
+  .velocity .sub{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);letter-spacing:.08em}
+  .track{position:relative;height:74px;margin:0 4px}
+  .axis{position:absolute;left:0;right:0;bottom:24px;height:1px;background:var(--border)}
+  .tick{position:absolute;bottom:0;transform:translateX(-50%);font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);white-space:nowrap}
+  .tick::before{content:"";position:absolute;left:50%;bottom:24px;width:1px;height:6px;background:var(--border);transform:translateX(-50%)}
+  .vdot{position:absolute;bottom:24px;width:9px;height:9px;border-radius:50%;transform:translate(-50%,50%);border:1.5px solid var(--ground);cursor:default;transition:transform .15s}
+  .vdot:hover{transform:translate(-50%,50%) scale(1.55);z-index:3}
+  .vdot.s-shipped{background:var(--ship)} .vdot.s-progress{background:var(--progress)}
+
+  /* ---------- clusters ---------- */
+  main{padding:30px 0 40px}
+  .cluster{margin-top:54px;scroll-margin-top:80px}
+  .cluster.hidden{display:none}
+  .cl-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--border-soft);padding-bottom:14px;margin-bottom:24px}
+  .cl-idx{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--brass);letter-spacing:.1em}
+  .cl-head h2{font-family:"Fraunces",serif;font-weight:500;font-size:1.7rem;letter-spacing:-.01em;margin:0}
+  .cl-count{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);margin-left:auto}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+  .card{
+    background:var(--surface);border:1px solid var(--border-soft);
+    border-radius:13px;padding:20px 20px 18px;position:relative;
+    display:flex;flex-direction:column;gap:9px;
+    transition:border-color .15s,transform .15s,background .15s;
+  }
+  .card.hidden{display:none}
+  .card::before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:2.5px;border-radius:2px;background:var(--border)}
+  .card.s-shipped::before{background:var(--ship)}
+  .card.s-progress::before{background:var(--progress)}
+  .card.s-roadmap::before{background:var(--road)}
+  .card{cursor:pointer}
+  .card:hover{border-color:var(--brass);transform:translateY(-2px);background:var(--surface-2)}
+  .card .c-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .card h4{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:1.02rem;margin:0;letter-spacing:-.005em;padding-left:12px}
+  .card p{margin:0;font-size:.91rem;color:var(--muted);line-height:1.5;padding-left:12px}
+  .pill{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+    text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;
+    border:1px solid transparent;
+  }
+  .pill.s-shipped{color:var(--ship);background:rgba(87,185,138,.1);border-color:rgba(87,185,138,.28)}
+  .pill.s-progress{color:var(--progress);background:rgba(224,138,82,.1);border-color:rgba(224,138,82,.3)}
+  .pill.s-roadmap{color:var(--road);background:rgba(124,146,180,.1);border-color:rgba(124,146,180,.3)}
+  .card .date{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);padding-left:12px;margin-top:2px}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--border-soft);margin-top:64px;padding:34px 0 60px}
+  .foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  .foot .tag{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--faint);letter-spacing:.05em}
+  .foot .conf{color:var(--brass);border:1px solid rgba(205,163,73,.3);border-radius:6px;padding:5px 12px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase}
+
+  @media (max-width:720px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .hero{padding:48px 0 20px}
+    .legend{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-inner">
+    <div class="mark">SEMI <span>/</span> THE BUILD</div>
+    <div class="bar-spacer"></div>
+    <div class="legend">
+      <span><i class="dot d-ship"></i>Shipped</span>
+      <span><i class="dot d-prog"></i>In progress</span>
+      <span><i class="dot d-road"></i>Roadmap</span>
+    </div>
+    <div class="filters" id="filters" role="group" aria-label="Filter by status">
+      <button data-f="all" aria-pressed="true">All</button>
+      <button data-f="shipped" aria-pressed="false">Shipped</button>
+      <button data-f="progress" aria-pressed="false">In progress</button>
+      <button data-f="roadmap" aria-pressed="false">Roadmap</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <p class="eyebrow">Internal operating platform · May–June 2026</p>
+    <h1>An operating system for SEMI, <em>built in six weeks.</em></h1>
+    <p class="lede">Every system below was designed and shipped inside Claude Code — cockpits, deal engines, automation pipelines, and the agents that run them. <strong>One founder, directing the work.</strong> This is the leverage layer underneath the company: what's live today, what's being finished, and where it goes next.</p>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="n brass" id="s-shipped">—</div><div class="k">Systems shipped</div></div>
+      <div class="stat"><div class="n" id="s-progress">—</div><div class="k">In progress</div></div>
+      <div class="stat"><div class="n" id="s-roadmap">—</div><div class="k">On the roadmap</div></div>
+      <div class="stat"><div class="n">~6</div><div class="k">Weeks elapsed</div></div>
+    </div>
+  </section>
+
+  <section class="velocity" aria-label="Build velocity timeline">
+    <div class="head">
+      <h3>Build velocity</h3>
+      <span class="sub">May 18 → Jun 26, 2026 · each mark = one shipped system</span>
+    </div>
+    <div class="track" id="track"></div>
+  </section>
+</div>
+
+<main class="wrap" id="clusters"></main>
+
+<footer class="wrap">
+  <div class="foot">
+    <span class="tag">SEMI Development Studio · semistudio.com — prepared for partner review</span>
+    <span class="conf">Confidential</span>
+  </div>
+</footer>
+
+<script>
+const TOOLS = [
+  // ---- Command & Cockpit ----
+  {cl:0, n:"SEMI Command Center", s:"shipped", d:"2026-06-10", dl:"Jun 2026 · v0.3", t:"Master cockpit aggregating every SEMI surface — ops, pipelines, dashboards — at a single tailnet address."},
+  {cl:0, n:"Super Cockpit", s:"shipped", d:"2026-05-28", dl:"May 28", t:"Top-of-stack tabbed UI unifying SEMI ops, family, and reading surfaces into one control plane."},
+  {cl:0, n:"Embedded Claude", s:"shipped", d:"2026-05-31", dl:"May 31 · parity Jun 17", t:"Persistent Claude sidebar across every cockpit view — Opus 4.8 with hourly-synced memory."},
+  {cl:0, n:"Mini Automation Node", s:"shipped", d:"2026-05-31", dl:"May 31", t:"Mac Mini as the always-on host for all data-refresh and automation jobs (Path-A cutover complete)."},
+  {cl:0, n:"Cloud Redundancy", s:"shipped", d:"2026-05-30", dl:"May 30", t:"Hetzner failover node on the tailnet keeps the platform alive if the local host drops — $9/mo."},
+  {cl:0, n:"Dashboard Engine", s:"shipped", d:"2026-06-17", dl:"Jun 17", t:"Generates and classifies adaptive dashboards on demand; gallery lives as a cockpit subtab."},
+
+  // ---- Operations & PM ----
+  {cl:1, n:"Task Management System", s:"shipped", d:"2026-05-18", dl:"May 18", t:"Portfolio-rollup infrastructure across all projects, with a live Dinosaur dashboard on top."},
+  {cl:1, n:"Tasks Web App", s:"shipped", d:"2026-05-18", dl:"May 18", t:"Next.js interface sitting over the project workbooks — tasks as a real app, not a spreadsheet."},
+  {cl:1, n:"PM Tracker", s:"progress", d:"2026-06-12", dl:"In beta testing", t:"Live project tracker; Zach-owned beta, with Newton (1201) as the first full build."},
+  {cl:1, n:"PM Handoff System", s:"shipped", d:"2026-05-19", dl:"May 19", t:"Morning Brief + Accountability Ledger — a daily Claude↔PM handoff loop for Zach."},
+  {cl:1, n:"Performance Tracker", s:"shipped", d:"2026-06-12", dl:"Jun 12 · prod", t:"Per-person performance tracking, promoted to production."},
+  {cl:1, n:"Capture-to-Action Pipeline", s:"shipped", d:"2026-05-25", dl:"May 2026 · cron", t:"Voice memos flow through Claude and land as structured tasks — automatically, on a schedule."},
+  {cl:1, n:"Stats Terminal", s:"shipped", d:"2026-05-21", dl:"May 21 · v3.1", t:"Bloomberg-style six-tab operations dashboard for the whole portfolio."},
+  {cl:1, n:"Meeting Intelligence Bridge", s:"shipped", d:"2026-06-04", dl:"Jun 4 · live", t:"Meeting intake converted into structured intelligence, running live on the Mini node."},
+  {cl:1, n:"Handoff Processor", s:"shipped", d:"2026-05-30", dl:"May 30 · v2", t:"Drive-based session-close handoff processing so context never falls on the floor."},
+
+  // ---- Deal & Capital (FIN-OS) ----
+  {cl:2, n:"FIN-OS", s:"progress", d:"2026-06-15", dl:"Platform · active", t:"Reusable financial operating engine; first live instance is Dinosaur Pizza / CDMX."},
+  {cl:2, n:"Investor Engine", s:"progress", d:"2026-06-15", dl:"In progress", t:"Investor memo + gated portal + Claude IR brain + asset layer — the capital-in module of FIN-OS."},
+  {cl:2, n:"Raise Engine", s:"shipped", d:"2026-06-09", dl:"Jun 9", t:"Brand-agnostic capital-raise platform — Studio CLI plus generated deal pages."},
+  {cl:2, n:"Property Acquisition Engine", s:"shipped", d:"2026-06-05", dl:"Jun 5 · v0.2", t:'All phases built (codename "Prospector") — sourcing-to-underwrite for real-estate deals.'},
+  {cl:2, n:"Diligence Engine", s:"progress", d:"2026-06-01", dl:"M1 done · M2 active", t:"Six-lens AI evaluation product for F&B opportunities; first milestone shipped."},
+  {cl:2, n:"Financing Document Engine", s:"progress", d:"2026-06-20", dl:"Phase 1 shipped", t:"Bank- and investor-ready document generator; catalog phase live, more phases queued."},
+  {cl:2, n:"Opportunity Lab", s:"shipped", d:"2026-05-31", dl:"May 31 · v4", t:"Chat-first workspace that decomposes an opportunity into a scenario canvas."},
+
+  // ---- Brand & Growth ----
+  {cl:3, n:"Brand & Communication Engine", s:"shipped", d:"2026-06-03", dl:"Jun 3 · P0–P5", t:"Full brand and comms monorepo — the studio's content production system."},
+  {cl:3, n:"Dinosaur Brand Engine", s:"shipped", d:"2026-06-12", dl:"Jun 12", t:"64/64 + 20/20 content pipelines deployed, with LinkedIn OAuth wired in."},
+  {cl:3, n:"Asset Hub", s:"shipped", d:"2026-06-12", dl:"Jun 12", t:"Browser surface for ~439 generated brand assets — searchable, not scattered."},
+  {cl:3, n:"Role / AI-Fit Evaluator", s:"shipped", d:"2026-05-31", dl:"May 31", t:"Web app that scores any role for AI leverage — used to design how the team works."},
+  {cl:3, n:"SEMI Radio", s:"shipped", d:"2026-06-16", dl:"Jun 16 · live", t:"Daily ~2-min two-host audio briefing, auto-generated from the day's signals."},
+
+  // ---- CDMX / Dinosaur Pizza ----
+  {cl:4, n:"CDMX 9-Phase Framework", s:"progress", d:"2026-06-20", dl:"In execution", t:"The Dinosaur Pizza playbook — phases 2, 5, and 6 currently firing."},
+  {cl:4, n:"Dinosaur Intranet", s:"progress", d:"2026-06-25", dl:"Camino A committed", t:"Wansoft core + a Claude intelligence layer on top — the venture's operating brain."},
+  {cl:4, n:"CDMX Master Workbook", s:"shipped", d:"2026-06-01", dl:"Workbook of record", t:"Canonical financial + operating workbook for the Dinosaur Pizza venture."},
+
+  // ---- Bilingual Comms (MX ops) ----
+  {cl:5, n:"Enlace", s:"shipped", d:"2026-05-31", dl:"May 31", t:"Real-time Matt↔Alicia bilingual interpreter web app for cross-border ops."},
+  {cl:5, n:"Message Alicia Toolkit", s:"shipped", d:"2026-06-02", dl:"Jun 2", t:"Signed-Shortcut bilingual iMessage system — translation built into the phone."},
+  {cl:5, n:"Gmail Triage", s:"shipped", d:"2026-05-22", dl:"May 2026 · cron", t:"Auto-label inbox triage three times a day, weekdays — the inbox sorts itself."},
+  {cl:5, n:"Auto-Agenda", s:"shipped", d:"2026-05-26", dl:"May 2026 · every 5m", t:"Apps Script attaches a living agenda doc to every calendar event, automatically."},
+
+  // ---- Studio & Physical ----
+  {cl:6, n:"Stream Deck Control Surface", s:"shipped", d:"2026-05-28", dl:"May 28", t:"12-key hardware control surface unifying the most-used actions into one panel."},
+  {cl:6, n:"Two-Camera Capture Rig", s:"shipped", d:"2026-06-09", dl:"Jun 9", t:"OBS + NDI two-iPhone live-switch studio for content and remote presence."},
+  {cl:6, n:"Studio Kiosk Pi", s:"progress", d:"2026-06-12", dl:"Kit staged", t:"Raspberry-Pi ambient cockpit kiosk for the studio wall — hardware staged for deploy."},
+  {cl:6, n:"Workstation Buildout", s:"progress", d:"2026-06-05", dl:"In progress", t:"Seven per-team-member command workstations — the physical side of the platform."},
+  {cl:6, n:"Car Gate Automation", s:"shipped", d:"2026-05-24", dl:"May 2026", t:"1201 gate control via Control4 → FastAPI → iPhone shortcuts."},
+
+  // ---- Knowledge & Decision Intelligence ----
+  {cl:7, n:"semi-brain", s:"shipped", d:"2026-05-15", dl:"Memory spine", t:"Git-backed memory architecture — one source of truth shared across every Claude surface."},
+  {cl:7, n:"Sounding Engine", s:"shipped", d:"2026-06-16", dl:"Jun 16", t:"Adaptive decision-elicitation interview — structured thinking-partner for hard calls."},
+  {cl:7, n:"Visionary Brief", s:"shipped", d:"2026-05-30", dl:"May 30 · 5am", t:"Daily synthesis: one decision, one delegation, one signal, one notice — every morning."},
+  {cl:7, n:"Team Claude Account", s:"progress", d:"2026-06-18", dl:"Rolling out", t:"Shared team Claude account plus a live onboarding guide for the whole studio."},
+  {cl:7, n:"Morning Q&A Launcher", s:"shipped", d:"2026-05-28", dl:"May 2026 · 5:30am", t:"iPhone card-grid that opens a seeded Claude chat to start the day in motion."},
+
+  // ---- Roadmap ----
+  {cl:8, n:"FIN-OS Deal Platform", s:"roadmap", d:null, dl:"Next", t:"Unify Raise, Investor, Acquisition, and Diligence engines into one productized capital platform."},
+  {cl:8, n:"Investor Portal", s:"roadmap", d:null, dl:"Next", t:"Gated LP portal plus IR brain for live raises — investor-facing front door."},
+  {cl:8, n:"Team-Wide Rollout", s:"roadmap", d:null, dl:"Next", t:"Claude accounts and command workstations across the full SEMI team."},
+  {cl:8, n:"Dinosaur Full Intranet", s:"roadmap", d:null, dl:"Next", t:"Wansoft API + QBO / CONTPAQi integration and full operational rollout in CDMX."},
+  {cl:8, n:"Financial Data Layer", s:"roadmap", d:null, dl:"Next", t:"Unified QBO + bank + card query layer so financials are conversational and live."},
+];
+
+const CLUSTERS = [
+  {t:"Command & Cockpit", k:"The platform spine — where every system surfaces and runs."},
+  {t:"Operations & Project Management", k:"How work is tracked, handed off, and held accountable."},
+  {t:"Deal & Capital Engines · FIN-OS", k:"Sourcing, underwriting, raising, and documenting deals."},
+  {t:"Brand & Growth", k:"The studio's content and brand production machine."},
+  {t:"CDMX · Dinosaur Pizza", k:"The first full venture instance of the platform."},
+  {t:"Bilingual & Cross-Border Comms", k:"Running an operation across the US–Mexico line."},
+  {t:"Studio & Physical Systems", k:"Where the software meets hardware and the room."},
+  {t:"Knowledge & Decision Intelligence", k:"Memory, daily synthesis, and decision support."},
+  {t:"Roadmap", k:"Where the platform is headed next."},
+];
+
+// ---- counts ----
+const count = s => TOOLS.filter(t=>t.s===s).length;
+document.getElementById('s-shipped').textContent = count('shipped');
+document.getElementById('s-progress').textContent = count('progress');
+document.getElementById('s-roadmap').textContent = count('roadmap');
+
+// ---- render clusters ----
+const root = document.getElementById('clusters');
+CLUSTERS.forEach((c,i)=>{
+  const items = TOOLS.filter(t=>t.cl===i);
+  if(!items.length) return;
+  const sec = document.createElement('section');
+  sec.className='cluster';
+  sec.dataset.cl=i;
+  const idx = String(i+1).padStart(2,'0');
+  sec.innerHTML = `
+    <div class="cl-head">
+      <span class="cl-idx">${idx}</span>
+      <h2>${c.t}</h2>
+      <span class="cl-count">${items.length} ${items.length===1?'system':'systems'}</span>
+    </div>
+    <div class="grid">
+      ${items.map(t=>`
+        <article class="card s-${t.s}" data-s="${t.s}">
+          <div class="c-top">
+            <h4>${t.n}</h4>
+            <span class="pill s-${t.s}">${t.s==='progress'?'In progress':t.s==='roadmap'?'Roadmap':'Shipped'}</span>
+          </div>
+          <p>${t.t}</p>
+          <span class="date">${t.dl}</span>
+        </article>`).join('')}
+    </div>`;
+  root.appendChild(sec);
+});
+
+// ---- velocity timeline ----
+(function(){
+  const track = document.getElementById('track');
+  const start = new Date('2026-05-15').getTime();
+  const end   = new Date('2026-06-26').getTime();
+  const span  = end - start;
+  // axis ticks
+  [['May 18','2026-05-18'],['Jun 1','2026-06-01'],['Jun 15','2026-06-15'],['Jun 26','2026-06-26']].forEach(([lab,d])=>{
+    const x = ((new Date(d).getTime()-start)/span)*100;
+    const el=document.createElement('div'); el.className='tick'; el.style.left=x+'%'; el.textContent=lab;
+    track.appendChild(el);
+  });
+  const axis=document.createElement('div'); axis.className='axis'; track.appendChild(axis);
+  // dots
+  TOOLS.filter(t=>t.d).forEach(t=>{
+    const x=((new Date(t.d).getTime()-start)/span)*100;
+    const dot=document.createElement('div');
+    dot.className='vdot s-'+t.s;
+    dot.style.left=Math.max(1,Math.min(99,x))+'%';
+    dot.title=`${t.n} — ${t.dl}`;
+    track.appendChild(dot);
+  });
+})();
+
+// ---- filtering ----
+const fbtns=[...document.querySelectorAll('#filters button')];
+fbtns.forEach(b=>b.addEventListener('click',()=>{
+  const f=b.dataset.f;
+  fbtns.forEach(x=>x.setAttribute('aria-pressed', x===b));
+  document.querySelectorAll('.card').forEach(c=>{
+    c.classList.toggle('hidden', !(f==='all'||c.dataset.s===f));
+  });
+  document.querySelectorAll('.cluster').forEach(sec=>{
+    const any=[...sec.querySelectorAll('.card')].some(c=>!c.classList.contains('hidden'));
+    sec.classList.toggle('hidden',!any);
+  });
+}));
+
+// ---- system URLs for click-through (Tailscale IPs) ----
+const BASE='http://100.96.228.102:8765'; // Mini canonical
+const SYSTEM_URLS={
+  // Shipped systems
+  'Super Cockpit':BASE+'/views/super-cockpit',
+  'Family Wealth OS':BASE+'/views/fwos-cockpit.html',
+  'SEMI Command Center':BASE,
+  'Roy Family Brief':BASE+'/views/family-brief',
+  'Family Calendar Tool':BASE+'/views/family-calendar',
+  'Family Budget Tool':BASE+'/views/family-budget.html',
+  'Roy Cockpit Console':BASE+'/views/roy-copilot-console',
+  'Dashboard Engine':BASE+'/dashboards',
+  'Opportunity Lab v2':BASE+'/views/opportunity-lab',
+  'Embedded Claude in Cockpit':BASE,
+  'Diligence Engine v1':BASE+'/diligence',
+  'Brand & Communication Engine':BASE+'/brand',
+  'Raise Engine':BASE+'/raise',
+  'PAE — Property Acquisition Engine':BASE+'/pae',
+  'Role/AI-Fit Evaluator':BASE+'/role-evaluator',
+  'W17 Meeting Intelligence':BASE+'/meeting-intel',
+  'Enlace':BASE+'/enlace',
+  'SEMI Stats Terminal v3.1':BASE+'/stats',
+  'SEMI Task Management':BASE+'/tasks',
+  'SEMI Asset Hub':BASE+'/assets',
+  // In Progress
+  'Dinosaur Intranet':BASE+'/dinosaur',
+  'Tasks Performance Tracker':BASE+'/tasks-tracker',
+  'Sounding Engine':BASE+'/sounding',
+  'Investor Engine':BASE+'/investor',
+  'SEMI Radio':BASE+'/radio',
+  'Health OS':BASE+'/health',
+  // Roadmap
+  'Newton (PRJ-001)':BASE+'/projects/newton',
+  'Carmel (PRJ-002)':BASE+'/projects/carmel',
+  'Dinosaur Pizza CDMX (PRJ-004)':BASE+'/projects/dinosaur',
+  'Sanctuary MX':BASE+'/projects/sanctuary',
+  'EDC Pipeline':BASE+'/projects/edc',
+};
+
+// Add click handlers to cards
+document.querySelectorAll('.card').forEach(card=>{
+  const title=card.querySelector('h4')?.textContent?.trim();
+  const url=SYSTEM_URLS[title];
+  if(url){
+    card.style.cursor='pointer';
+    card.addEventListener('click',()=>{
+      if(url.startsWith('http')){
+        window.open(url,'_blank');
+      }else{
+        alert('Open: '+url+'\n\nThis would navigate to: '+url);
+      }
+    });
+    // Show URL hint on hover
+    const p=card.querySelector('p');
+    if(p){
+      const hint=document.createElement('div');
+      hint.className='card-url-hint';
+      hint.style.fontSize='0.75rem';
+      hint.style.color='var(--brass)';
+      hint.style.marginTop='8px';
+      hint.style.fontFamily='"IBM Plex Mono",monospace';
+      hint.style.wordBreak='break-all';
+      hint.textContent='→ '+url;
+      card.appendChild(hint);
+    }
+  }
+});
+</script>
+</body>
+</html>
