@@ -240,7 +240,7 @@ const TOOLS = [
 
   // ---- Deal & Capital (FIN-OS) ----
   {cl:2, n:"FIN-OS", s:"progress", d:"2026-06-15", dl:"Platform · active", t:"Reusable financial operating engine; first live instance is Dinosaur Pizza / CDMX."},
-  {cl:2, n:"Capital Modeling Engine", s:"shipped", d:"2026-07-14", dl:"Jul 14 · prod", t:"Externally-shareable capital structure modeling with English/Spanish, USD/MXN live rates (Banxico), and email-verified access. Claude-powered expert advisor."},
+  {cl:2, n:"Capital Modeling Engine", s:"shipped", d:"2026-07-14", dl:"Jul 14 · prod", t:"Externally-shareable capital structure modeling with English/Spanish, USD/MXN live rates (Banxico), and email-verified access. Claude-powered expert advisor.", url:"https://tasks.semistudio.com/capital-engine-public"},
   {cl:2, n:"Investor Engine", s:"progress", d:"2026-06-15", dl:"In progress", t:"Investor memo + gated portal + Claude IR brain + asset layer — the capital-in module of FIN-OS."},
   {cl:2, n:"Raise Engine", s:"shipped", d:"2026-06-09", dl:"Jun 9", t:"Brand-agnostic capital-raise platform — Studio CLI plus generated deal pages."},
   {cl:2, n:"Property Acquisition Engine", s:"shipped", d:"2026-06-05", dl:"Jun 5 · v0.2", t:'All phases built (codename "Prospector") — sourcing-to-underwrite for real-estate deals.'},
@@ -322,15 +322,17 @@ CLUSTERS.forEach((c,i)=>{
       <span class="cl-count">${items.length} ${items.length===1?'system':'systems'}</span>
     </div>
     <div class="grid">
-      ${items.map(t=>`
-        <article class="card s-${t.s}" data-s="${t.s}">
+      ${items.map(t=>{
+        const card = `<article class="card s-${t.s}" data-s="${t.s}">
           <div class="c-top">
             <h4>${t.n}</h4>
             <span class="pill s-${t.s}">${t.s==='progress'?'In progress':t.s==='roadmap'?'Roadmap':'Shipped'}</span>
           </div>
           <p>${t.t}</p>
           <span class="date">${t.dl}</span>
-        </article>`).join('')}
+        </article>`;
+        return t.url ? `<a href="${t.url}" style="text-decoration:none;color:inherit">${card}</a>` : card;
+      }).join('')}
     </div>`;
   root.appendChild(sec);
 });
